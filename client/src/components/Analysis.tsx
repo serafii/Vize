@@ -5,35 +5,43 @@ import {
   CheckCircle2Icon,
   AlertTriangleIcon,
   FileCode2Icon,
-  PackageIcon,
+  FolderIcon,
+  FileDigitIcon,
 } from "lucide-react";
+import LANGUAGE_COLORS from "../Utils/languages";
+
 interface ResultsViewProps {
   analyzedUrl: string;
   onBack: () => void;
+  analysisResult?: {
+    totalFiles: number;
+    totalDirs: number;
+    totalSize: number;
+    languages: Record<string, number>;
+  };
 }
 
-const ResultsView: React.FC<ResultsViewProps> = ({ analyzedUrl, onBack }) => {
+const ResultsView: React.FC<ResultsViewProps> = ({
+  analyzedUrl,
+  onBack,
+  analysisResult,
+}) => {
   const stats = [
     {
       label: "Total Files",
-      value: "1,248",
+      value: analysisResult?.totalFiles.toString() || "N/A",
       icon: <FileCode2Icon className="w-5 h-5 text-blue-400" />,
     },
     {
-      label: "Dependencies",
-      value: "156",
-      icon: <PackageIcon className="w-5 h-5 text-purple-400" />,
-    },
-    {
-      label: "Vulnerabilities",
-      value: "2",
-      icon: <AlertTriangleIcon className="w-5 h-5 text-yellow-400" />,
+      label: "Total Directories",
+      value: analysisResult?.totalDirs.toString() || "N/A",
+      icon: <FolderIcon className="w-5 h-5 text-yellow-400" />,
       alert: true,
     },
     {
-      label: "Health Score",
-      value: "94/100",
-      icon: <CheckCircle2Icon className="w-5 h-5 text-green-400" />,
+      label: "Total Size",
+      value: analysisResult?.totalSize.toString() + " MB" || "N/A",
+      icon: <FileDigitIcon className="w-5 h-5 text-green-400" />,
     },
   ];
   return (
@@ -69,7 +77,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ analyzedUrl, onBack }) => {
           </div>
           <button
             onClick={onBack}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors border border-white/10"
+            className="flex items-center hover:cursor-pointer justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors border border-white/10"
           >
             <ArrowLeftIcon className="w-4 h-4" />
             Analyze New Project
@@ -96,6 +104,58 @@ const ResultsView: React.FC<ResultsViewProps> = ({ analyzedUrl, onBack }) => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Languages Bar */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-white mb-4">Languages</h3>
+
+          {/* Stacked bar */}
+          <div className="flex w-full h-3 rounded-full overflow-hidden gap-0.5">
+            {analysisResult?.languages &&
+              Object.entries(analysisResult.languages).map(
+                ([lang, pct], index) => (
+                  <motion.div
+                    key={lang}
+                    className="h-full first:rounded-l-full last:rounded-r-full"
+                    style={{
+                      backgroundColor:
+                        LANGUAGE_COLORS[lang] || LANGUAGE_COLORS.Other,
+                      width: `${pct}%`,
+                    }}
+                    initial={{
+                      scaleX: 0,
+                    }}
+                    animate={{
+                      scaleX: 1,
+                    }}
+                    transition={{
+                      duration: 0.6,
+                      delay: 0.1 + index * 0.05,
+                      ease: "easeOut",
+                    }}
+                  />
+                ),
+              )}
+          </div>
+
+          {/* Legend */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2 mt-4">
+            {analysisResult?.languages &&
+              Object.entries(analysisResult.languages).map(([lang, pct]) => (
+                <div key={lang} className="flex items-center gap-2">
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{
+                      backgroundColor:
+                        LANGUAGE_COLORS[lang] || LANGUAGE_COLORS.Other,
+                    }}
+                  />
+                  <span className="text-sm text-gray-300">{lang}</span>
+                  <span className="text-sm text-gray-500">{pct}%</span>
+                </div>
+              ))}
+          </div>
         </div>
 
         {/* Mock Details Section */}

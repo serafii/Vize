@@ -6,9 +6,19 @@ import axios from "axios";
 
 interface InputAreaProps {
   onAnalyze: (url: string) => void;
+  setAnalysisResult: (result: any) => void;
 }
+// interface AnalysisResult {
+//   totalFiles: number;
+//   totalDirs: number;
+//   totalSize: number;
+//   languages: Record<string, number>;
+// }
 
-const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
+const InputArea: React.FC<InputAreaProps> = ({
+  onAnalyze,
+  setAnalysisResult,
+}) => {
   const [url, setUrl] = useState<string>("");
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -98,19 +108,37 @@ const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/analyze",
+        "http://localhost:8000/upload/analyze",
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
       );
 
       if (response.data.success) {
-        onAnalyze(url || "Uploaded Directory");
+        response.data.type === "file"
+          ? onAnalyze(response.data.filename)
+          : onAnalyze(url);
+
+        const { total_files, total_dirs, total_size, languages } =
+          response.data.data;
+
+        const analyzedData = {
+          totalFiles: total_files,
+          totalDirs: total_dirs,
+          totalSize: total_size,
+          languages: languages,
+        };
+
+        setAnalysisResult(analyzedData);
       }
-    } catch (error) {
+
+      if (response.data.success == false) {
+        messageApi.open({
+          type: "error",
+          content:
+            response.data.message ||
+            "An error occurred during analysis. Please try again.",
+        });
+      }
+    } catch (error: any) {
       console.error("Error during analysis:", error);
       messageApi.open({
         type: "error",
