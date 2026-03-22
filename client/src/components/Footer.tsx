@@ -3,7 +3,7 @@ import { HexagonIcon } from "lucide-react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="w-full border-t border-white/5 bg-surface/50 mt-auto">
+    <footer className="w-full border-t border-white/5 bg-surface/50 mt-auto z-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
         <div className="flex flex-col md:flex-row items-start justify-between gap-10 mb-12">
           <div className="max-w-xs">

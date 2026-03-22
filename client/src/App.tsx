@@ -20,15 +20,15 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
-      <div className="w-full h-150 absolute top-0 left-0 z-0">
+      <div className="w-full h-[120vh] fixed top-0 left-0 z-0 pointer-events-none">
         <LightRays
-          raysOrigin="top-center"
+          raysOrigin="right"
           raysColor="#facc15"
-          raysSpeed={0.65}
-          lightSpread={0.7}
+          raysSpeed={0.9}
+          lightSpread={0.8}
           rayLength={2.6}
           followMouse={true}
-          mouseInfluence={0.07}
+          mouseInfluence={0.1}
           noiseAmount={0}
           distortion={0}
           className="custom-rays"
@@ -37,6 +37,24 @@ const App: React.FC = () => {
           saturation={1}
         />
       </div>
+      <div className="w-full h-[120vh] fixed top-0 left-0 z-0 pointer-events-none">
+        <LightRays
+          raysOrigin="left"
+          raysColor="#facc15"
+          raysSpeed={0.9}
+          lightSpread={0.8}
+          rayLength={2.6}
+          followMouse={true}
+          mouseInfluence={0.1}
+          noiseAmount={0}
+          distortion={0}
+          className="custom-rays"
+          pulsating={false}
+          fadeDistance={1}
+          saturation={1}
+        />
+      </div>
+      <div className="pointer-events-none absolute top-0 left-0 w-full h-full z-5 bg-linear-to-b from-transparent to-background" />
       <NavBar />
       <main className="min-h-screen bg-background flex flex-col items-center pt-20 pb-28 md:pt-32 px-4 sm:px-6">
         <div className="w-full mx-auto flex flex-col items-center">
@@ -46,9 +64,9 @@ const App: React.FC = () => {
           ) : (
             <>
               <InputArea onAnalyze={handleAnalyze} />
-              <InfoSection />
               <Features />
               <Reason />
+              <InfoSection />
             </>
           )}
         </div>
