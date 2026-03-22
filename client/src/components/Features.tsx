@@ -38,36 +38,32 @@ const Features: React.FC = () => {
 
   return (
     <motion.div
-      className="w-full max-w-5xl mx-auto mt-20 mb-8 px-4 sm:px-6"
+      className="w-full max-w-5xl mx-auto mt-20 mb-8 px-4 sm:px-6 z-10"
       variants={containerVariants}
       initial="hidden"
       animate="show"
     >
-      <div className="text-center mb-10">
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="text-center mb-10"
+      >
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest">
           Our Features
         </h2>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {features.map((feature, index) => (
           <motion.div
             key={index}
-            variants={{
-              hidden: {
-                opacity: 0,
-                y: 20,
-              },
-              show: {
-                opacity: 1,
-                y: 0,
-                transition: {
-                  duration: 0.5,
-                  ease: "easeOut",
-                },
-              },
-            }}
-            className="bg-surface border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors group"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="bg-surface border border-white/5 rounded-2xl p-6 hover:border-accent/25 transition-colors group"
           >
             <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
               {feature.icon}
