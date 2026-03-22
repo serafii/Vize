@@ -34,8 +34,6 @@ async def analyze_codebase(url: str = Form(None), file: UploadFile = File(None))
         finally:
             cleanup_directory(upload_dir)
 
-        print(f"Parsed directory: {parse_result}")
-
         return {
         "success": True,
         "type": "file",

@@ -6,9 +6,19 @@ import axios from "axios";
 
 interface InputAreaProps {
   onAnalyze: (url: string) => void;
+  setAnalysisResult: (result: any) => void;
 }
+// interface AnalysisResult {
+//   totalFiles: number;
+//   totalDirs: number;
+//   totalSize: number;
+//   languages: Record<string, number>;
+// }
 
-const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
+const InputArea: React.FC<InputAreaProps> = ({
+  onAnalyze,
+  setAnalysisResult,
+}) => {
   const [url, setUrl] = useState<string>("");
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -103,11 +113,21 @@ const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
       );
 
       if (response.data.success) {
-        if (response.data.type === "file") {
-          onAnalyze(response.data.filename);
-        } else if (response.data.type === "url") {
-          onAnalyze(url);
-        }
+        response.data.type === "file"
+          ? onAnalyze(response.data.filename)
+          : onAnalyze(url);
+
+        const { total_files, total_dirs, total_size, languages } =
+          response.data.data;
+
+        const analyzedData = {
+          totalFiles: total_files,
+          totalDirs: total_dirs,
+          totalSize: total_size,
+          languages: languages,
+        };
+
+        setAnalysisResult(analyzedData);
       }
 
       if (response.data.success == false) {

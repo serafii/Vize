@@ -9,6 +9,13 @@ import Features from "./components/Features";
 import Analysis from "./components/Analysis";
 import Footer from "./components/Footer";
 
+interface AnalysisResult {
+  totalFiles: number;
+  totalDirs: number;
+  totalSize: number;
+  languages: Record<string, number>;
+}
+
 const App: React.FC = () => {
   const [analyzedUrl, setAnalyzedUrl] = useState<string | null>(null);
   const handleAnalyze = (url: string) => {
@@ -17,6 +24,13 @@ const App: React.FC = () => {
   const handleBack = () => {
     setAnalyzedUrl(null);
   };
+
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult>({
+    totalFiles: 0,
+    totalDirs: 0,
+    totalSize: 0,
+    languages: {},
+  });
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
@@ -60,10 +74,17 @@ const App: React.FC = () => {
         <div className="w-full mx-auto flex flex-col items-center">
           <Header />
           {analyzedUrl ? (
-            <Analysis analyzedUrl={analyzedUrl} onBack={handleBack} />
+            <Analysis
+              analyzedUrl={analyzedUrl}
+              onBack={handleBack}
+              analysisResult={analysisResult}
+            />
           ) : (
             <>
-              <InputArea onAnalyze={handleAnalyze} />
+              <InputArea
+                onAnalyze={handleAnalyze}
+                setAnalysisResult={setAnalysisResult}
+              />
               <Features />
               <Reason />
               <InfoSection />

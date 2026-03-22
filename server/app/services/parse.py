@@ -2,20 +2,10 @@ import os
 import shutil
 import zipfile
 from fastapi import UploadFile
+from app.utils.languages import KNOWN_LANGUAGES, IGNORED_DIRS, IGNORED_EXTENSIONS
 
 MAX_UNZIPPED_SIZE_MB = 50
 MAX_FILES = 2000
-
-IGNORED_DIRS = {
-    "node_modules", ".git", "__pycache__", "dist", "build", ".next", ".venv"
-}
-
-IGNORED_EXTENSIONS = {
-    ".png", ".jpg", ".jpeg", ".gif", ".svg",
-    ".exe", ".dll", ".so",
-    ".zip", ".tar", ".gz"
-}
-
 
 # Validate the zip file before extracting to ensure it doesn't exceed size or file count limits
 def validate_zip(file: UploadFile) -> tuple[bool, str | None]:
@@ -46,6 +36,8 @@ def parse_directory(directory:str) -> dict:
     total_dirs = 0
     total_size = 0
 
+    language_frequency = {}
+
     for root, dirs, files in os.walk(directory):
 
         dirs[:] = [d for d in dirs if d not in IGNORED_DIRS and not d.startswith(".")]
@@ -64,17 +56,38 @@ def parse_directory(directory:str) -> dict:
             total_files += 1
             total_size += os.path.getsize(file_path)
         
+            # Count language frequency
+            lang = KNOWN_LANGUAGES.get(ext, "Other")
+            language_frequency[lang] = language_frequency.get(lang, 0) + 1
+
     total_size = total_size / (1024 * 1024) # Convert bytes to megabytes
     total_size = round(total_size, 2)
 
-    return {"total_files": total_files, "total_dirs": total_dirs, "total_size": total_size}
+    sorted_langs = sorted(language_frequency.items(), key=lambda x: x[1], reverse=True)
 
+    top_langs = 3
+    dominant_languages = {}
+    other_count = 0
+
+    for i, (lang, count) in enumerate(sorted_langs):
+        if i < top_langs and lang != "Other":
+            dominant_languages[lang] = round((count / total_files) * 100, 2)
+        else:
+            other_count += count
+
+    if other_count > 0:
+        dominant_languages["Other"] = round((other_count / total_files) * 100, 2)
+
+    return {"total_files": total_files, "total_dirs": total_dirs, "total_size": total_size, "languages": dominant_languages}
+
+# Removes the temporary directory
 def cleanup_directory(upload_dir: str):
     try:
         shutil.rmtree(upload_dir)
     except Exception as e:
         print("Cleanup error:", e)
 
+# Ensures that the zip file is safely extracted
 def safe_extract(zip_ref: zipfile.ZipFile, path: str):
     os.makedirs(path, exist_ok=True)
 
