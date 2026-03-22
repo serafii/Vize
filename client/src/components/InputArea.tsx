@@ -98,19 +98,27 @@ const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/analyze",
+        "http://localhost:8000/upload/analyze",
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
       );
 
       if (response.data.success) {
-        onAnalyze(url || "Uploaded Directory");
+        if (response.data.type === "file") {
+          onAnalyze(response.data.filename);
+        } else if (response.data.type === "url") {
+          onAnalyze(url);
+        }
       }
-    } catch (error) {
+
+      if (response.data.success == false) {
+        messageApi.open({
+          type: "error",
+          content:
+            response.data.message ||
+            "An error occurred during analysis. Please try again.",
+        });
+      }
+    } catch (error: any) {
       console.error("Error during analysis:", error);
       messageApi.open({
         type: "error",

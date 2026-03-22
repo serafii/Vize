@@ -69,7 +69,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({ analyzedUrl, onBack }) => {
           </div>
           <button
             onClick={onBack}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors border border-white/10"
+            className="flex items-center hover:cursor-pointer justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors border border-white/10"
           >
             <ArrowLeftIcon className="w-4 h-4" />
             Analyze New Project
