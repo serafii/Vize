@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { LinkIcon, UploadIcon, ZapIcon } from "lucide-react";
+import { LinkIcon, UploadIcon, ZapIcon, FolderIcon, XIcon } from "lucide-react";
 import { message } from "antd";
+import axios from "axios";
 
 interface InputAreaProps {
   onAnalyze: (url: string) => void;
@@ -11,11 +12,73 @@ const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
   const [url, setUrl] = useState<string>("");
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const MAX_FILE_SIZE_MB = 10 * 1024 * 1024; // 10MB
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    e.target.value = ""; // Reset file input for future uploads
+
+    if (!file.name.endsWith(".zip")) {
+      messageApi.open({
+        type: "warning",
+        content:
+          "Only .zip files are supported. Please upload a valid .zip file.",
+      });
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE_MB) {
+      messageApi.open({
+        type: "warning",
+        content:
+          "File size exceeds the 10MB limit. Please upload a smaller file.",
+      });
+      return;
+    }
+
+    setUploadFile(file);
+  };
+
+  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    if (!url && !isDragging) return;
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith(".zip")) {
+      messageApi.warning("Only .zip files are supported.");
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE_MB) {
+      messageApi.warning("File exceeds 10MB limit.");
+      return;
+    }
+
+    setUploadFile(file);
+  };
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!url && !uploadFile) return;
+
+    if (url && uploadFile) {
+      messageApi.open({
+        type: "warning",
+        content: "Please either provide a URL or upload a file, not both.",
+      });
+      return;
+    }
+
     if (url && !isValidRepositoryURL(url)) {
       messageApi.open({
         type: "warning",
@@ -24,12 +87,39 @@ const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
       });
       return;
     }
-    setIsSubmitting(true);
-    // Simulate processing
-    setTimeout(() => {
+
+    try {
+      setIsSubmitting(true);
+      const formData = new FormData();
+      if (uploadFile) {
+        formData.append("file", uploadFile);
+      } else if (url) {
+        formData.append("url", url);
+      }
+
+      const response = await axios.post(
+        "http://localhost:8000/analyze",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (response.data.success) {
+        onAnalyze(url || "Uploaded Directory");
+      }
+    } catch (error) {
+      console.error("Error during analysis:", error);
+      messageApi.open({
+        type: "error",
+        content:
+          "An error occurred while processing your request. Please try again.",
+      });
+    } finally {
       setIsSubmitting(false);
-      onAnalyze(url || "Uploaded Directory");
-    }, 1500);
+    }
   };
 
   const isValidRepositoryURL = (input: string): boolean => {
@@ -84,9 +174,14 @@ const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <LinkIcon className="h-5 w-5 text-gray-500" />
                 </div>
+                <div
+                  className={`absolute inset-y-0 right-0 pr-4 flex items-center hover:cursor-pointer ${url ? "visible" : "hidden"}`}
+                  onClick={() => setUrl("")}
+                >
+                  <XIcon className="h-5 w-5 text-gray-500" />
+                </div>
                 <input
                   id="url-input"
-                  type="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="https://github.com/username/project"
@@ -108,9 +203,19 @@ const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
             </div>
 
             {/* Upload Zone */}
-            <div className="space-y-2">
+            <div
+              className="space-y-2"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                type="file"
+                accept=".zip"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileChange}
+              />
               <label className="block text-sm font-medium text-gray-300">
-                Upload Directory
+                Upload Project (.zip)
               </label>
               <div
                 className={`relative border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 group ${isDragging ? "border-accent bg-accent/5" : "border-white/10 hover:border-accent/40 hover:bg-white/2"}`}
@@ -119,10 +224,7 @@ const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
                   setIsDragging(true);
                 }}
                 onDragLeave={() => setIsDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setIsDragging(false);
-                }}
+                onDrop={handleFileDrop}
               >
                 <div
                   className={`p-3 rounded-full mb-3 transition-colors ${isDragging ? "bg-accent/20" : "bg-white/5 group-hover:bg-accent/10"}`}
@@ -136,16 +238,29 @@ const InputArea: React.FC<InputAreaProps> = ({ onAnalyze }) => {
                   and drop
                 </p>
                 <p className="text-xs text-gray-500 mt-2 text-center">
-                  Supports folders, .zip, and .tar.gz files up to 50MB
+                  Supports .zip folders up to 10MB
                 </p>
               </div>
             </div>
+            {uploadFile && (
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <FolderIcon className="w-5 h-5 text-accent" />
+                <span className="text-xs text-accent">{uploadFile.name}</span>
+                <button
+                  type="button"
+                  onClick={() => setUploadFile(null)}
+                  className="text-red-400 text-xs hover:text-red-500 hover:cursor-pointer transition-colors"
+                >
+                  <XIcon className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isSubmitting || (!url && !isDragging)}
-              className="w-full bg-accent text-black font-semibold rounded-xl py-4 px-6 flex items-center justify-center space-x-2 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+              disabled={isSubmitting || (!url && !uploadFile)}
+              className="w-full bg-accent text-black font-semibold rounded-xl py-4 px-6 flex items-center justify-center space-x-2 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer transition-all active:scale-[0.98]"
             >
               {isSubmitting ? (
                 <motion.div

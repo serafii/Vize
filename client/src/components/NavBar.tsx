@@ -26,7 +26,7 @@ const NavBar: React.FC = () => {
             <HexagonIcon className="w-4.5 h-4.5 text-accent" />
           </div>
           <span className="text-sm font-semibold text-white tracking-tight">
-            Name
+            Vize
           </span>
         </a>
 

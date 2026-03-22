@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
                 <HexagonIcon className="w-4 h-4 text-accent" />
               </div>
               <span className="text-base font-semibold text-white tracking-tight">
-                Name
+                Vize
               </span>
             </div>
             <p className="text-sm text-gray-500 leading-relaxed">
@@ -90,7 +90,7 @@ const Footer: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="text-sm text-gray-600">
-            &copy; {new Date().getFullYear()} Nexus Analyzer &middot; All rights
+            &copy; {new Date().getFullYear()} Vize Analyzer &middot; All rights
             reserved
           </span>
         </div>
