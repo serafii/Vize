@@ -28,13 +28,13 @@ def validate_zip(file: UploadFile) -> tuple[bool, str | None]:
             total_size += info.file_size
             total_files += 1
 
-    size_mb = total_size / (1024 * 1024) # Convert bytes to megabytes
+            size_mb = total_size / (1024 * 1024) # Convert bytes to megabytes
 
-    if size_mb > MAX_UNZIPPED_SIZE_MB:
-        return False, f"Zip too large ({round(size_mb,2)} MB)"
+            if size_mb > MAX_UNZIPPED_SIZE_MB:
+                return False, f"Zip too large ({round(size_mb,2)} MB)"
 
-    if total_files > MAX_FILES:
-        return False, f"Too many files ({total_files})"
+            if total_files > MAX_FILES:
+                return False, f"Too many files ({total_files})"
 
     return True, None
 
