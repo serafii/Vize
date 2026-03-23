@@ -149,20 +149,17 @@ const InputArea: React.FC<InputAreaProps> = ({
       }
 
       if (response.data.success == false) {
-        messageApi.open({
-          type: "error",
-          content:
-            response.data.message ||
+        message.error(
+          response.data.message ||
             "An error occurred during analysis. Please try again.",
-        });
+        );
+        setAnalysisError();
       }
     } catch (error: any) {
       console.error("Error during analysis:", error);
-      messageApi.open({
-        type: "error",
-        content:
-          "An error occurred while processing your request. Please try again.",
-      });
+      message.error(
+        "An error occurred while processing your request. Please try again.",
+      );
       setAnalysisError();
     } finally {
       setIsSubmitting(false);

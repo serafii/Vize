@@ -19,14 +19,14 @@ async def analyze_codebase(url: str = Form(None), file: UploadFile = File(None))
         return {"success": False, "message": "Provide URL or zip file"}
     
     async with semaphore:
-        upload_dir = f"uploaded_codebase_{uuid.uuid4().hex}"
+        upload_dir = f"temp_{uuid.uuid4().hex}"
         os.makedirs(upload_dir, exist_ok=True)
 
         try:
             if url:
                 # Verify that the repository exists
                 if not repo_exists(url):
-                    return {"success":False, "message":"Could not find any corresponding repository"}
+                    return {"success":False, "message":"Repository not found or too large"}
                     
                 # Clone the repository and validate its contents
                 try:
@@ -34,12 +34,18 @@ async def analyze_codebase(url: str = Form(None), file: UploadFile = File(None))
                 except Exception:
                     return {"success": False, "message": "Failed to clone repository"}
 
-                valid, error = await asyncio.to_thread(verify_repository, upload_dir)
+                try:
+                    valid, error = await asyncio.wait_for(asyncio.to_thread(verify_repository, upload_dir),timeout=10)
+                except asyncio.TimeoutError:
+                    return {"success": False, "message": "Repository too large or slow"}
 
                 if not valid:
                     return {"success": False, "message": error}
                     
-                return await process_pipeline(upload_dir, "url", url)
+                try:
+                    return await asyncio.wait_for(process_pipeline(upload_dir, "url", url),timeout=60)
+                except asyncio.TimeoutError:
+                    return {"success": False, "message": "Processing timed out"}
                 
             elif file:
                 # Validate the zip file before extracting
@@ -50,11 +56,18 @@ async def analyze_codebase(url: str = Form(None), file: UploadFile = File(None))
                 # Extract the zip file and proceed to parse files if the size is acceptable
 
                 with zipfile.ZipFile(file.file, 'r') as zip_ref:
-                    safe_extract(zip_ref, upload_dir)
+                    try:
+                        await asyncio.wait_for(asyncio.to_thread(safe_extract, zip_ref, upload_dir),timeout=10)
+                    except asyncio.TimeoutError:
+                        return {"success": False, "message": "Extraction timed out"}
 
                 file.file.seek(0)
 
-                return await process_pipeline(upload_dir, "file", file.filename)
+                try:
+                    return await asyncio.wait_for(process_pipeline(upload_dir, "file", file.filename),timeout=60)
+                except asyncio.TimeoutError:
+                    return {"success": False, "message": "Processing timed out"}
+                
         except Exception as e:
             return {"success": False, "message": str(e)}
         finally:
