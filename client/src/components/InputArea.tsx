@@ -13,6 +13,7 @@ interface InputAreaProps {
 //   totalDirs: number;
 //   totalSize: number;
 //   languages: Record<string, number>;
+//   analysis: Record<string, string>;
 // }
 
 const InputArea: React.FC<InputAreaProps> = ({
@@ -120,11 +121,14 @@ const InputArea: React.FC<InputAreaProps> = ({
         const { total_files, total_dirs, total_size, languages } =
           response.data.data;
 
+        const analysis = response.data.analysis;
+
         const analyzedData = {
           totalFiles: total_files,
           totalDirs: total_dirs,
           totalSize: total_size,
           languages: languages,
+          analysis: analysis,
         };
 
         setAnalysisResult(analyzedData);

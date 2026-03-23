@@ -2,13 +2,17 @@ import React from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
-  CheckCircle2Icon,
-  AlertTriangleIcon,
+  TargetIcon,
   FileCode2Icon,
   FolderIcon,
   FileDigitIcon,
+  WrenchIcon,
+  CpuIcon,
+  BoxesIcon,
+  WorkflowIcon,
 } from "lucide-react";
 import LANGUAGE_COLORS from "../Utils/languages";
+import { ClaudeIcon } from "../Utils/Icons";
 
 interface ResultsViewProps {
   analyzedUrl: string;
@@ -18,6 +22,16 @@ interface ResultsViewProps {
     totalDirs: number;
     totalSize: number;
     languages: Record<string, number>;
+    analysis: {
+      purpose: string;
+      technologies: string[];
+      architecture: string;
+      system_flow: string;
+      components: {
+        name: string;
+        description: string;
+      }[];
+    };
   };
 }
 
@@ -158,35 +172,92 @@ const ResultsView: React.FC<ResultsViewProps> = ({
           </div>
         </div>
 
-        {/* Mock Details Section */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white">Key Findings</h3>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3 p-4 rounded-xl bg-yellow-400/10 border border-yellow-400/20">
-              <AlertTriangleIcon className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-medium text-yellow-400 mb-1">
-                  Outdated Dependency: React
-                </h4>
-                <p className="text-sm text-yellow-400/70">
-                  Version 17.0.2 is currently installed. Consider upgrading to
-                  18.x for performance improvements and concurrent features.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-4 rounded-xl bg-green-400/10 border border-green-400/20">
-              <CheckCircle2Icon className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-medium text-green-400 mb-1">
-                  Optimal Bundle Size
-                </h4>
-                <p className="text-sm text-green-400/70">
-                  Initial load bundle is under 150kb, which is excellent for
-                  performance.
-                </p>
-              </div>
-            </div>
+        {/* Purpose */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2.5 mb-3">
+            <TargetIcon className="w-5 h-5 text-accent" />
+            <h3 className="text-lg font-semibold text-white">Purpose</h3>
           </div>
+          <p className="text-sm text-gray-400 leading-relaxed">
+            {analysisResult?.analysis.purpose}
+          </p>
+        </div>
+
+        {/* Technologies */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2.5 mb-3">
+            <WrenchIcon className="w-5 h-5 text-accent" />
+            <h3 className="text-lg font-semibold text-white">Technologies</h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {analysisResult?.analysis.technologies.map((tech) => (
+              <span
+                key={tech}
+                className="inline-flex items-center px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-sm font-medium border border-accent/20"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Architecture */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2.5 mb-3">
+            <CpuIcon className="w-5 h-5 text-accent" />
+            <h3 className="text-lg font-semibold text-white">Architecture</h3>
+          </div>
+          <div className="bg-background rounded-xl p-4 border border-white/5">
+            <p className="text-sm text-gray-400 leading-relaxed">
+              {analysisResult?.analysis.architecture}
+            </p>
+          </div>
+        </div>
+
+        {/* System Flow */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2.5 mb-3">
+            <WorkflowIcon className="w-5 h-5 text-accent" />
+            <h3 className="text-lg font-semibold text-white">System Flow</h3>
+          </div>
+          <div className="bg-background rounded-xl p-4 border border-white/5">
+            <p className="text-sm text-gray-400 leading-relaxed">
+              {analysisResult?.analysis.system_flow}
+            </p>
+          </div>
+        </div>
+
+        {/* Components */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2.5 mb-4">
+            <BoxesIcon className="w-5 h-5 text-accent" />
+            <h3 className="text-lg font-semibold text-white">
+              Components
+              <span className="ml-2 text-sm font-normal text-gray-300">
+                ({analysisResult?.analysis.components.length})
+              </span>
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {analysisResult?.analysis.components.map((comp) => (
+              <div
+                key={comp.name}
+                className="bg-background rounded-xl p-4 border border-white/5"
+              >
+                <h4 className="text-sm font-semibold text-white mb-1.5 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                  {comp.name}
+                </h4>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  {comp.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="p-2 flex items-center justify-center text-xs gap-2">
+          {ClaudeIcon}
+          <p className="text-gray-300">Powered by Claude Opus 4.6 </p>
         </div>
       </div>
     </motion.div>

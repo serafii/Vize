@@ -9,11 +9,25 @@ import Features from "./components/Features";
 import Analysis from "./components/Analysis";
 import Footer from "./components/Footer";
 
+interface Component {
+  name: string;
+  description: string;
+}
+
+interface Analysis {
+  purpose: string;
+  technologies: string[];
+  architecture: string;
+  system_flow: string;
+  components: Component[];
+}
+
 interface AnalysisResult {
   totalFiles: number;
   totalDirs: number;
   totalSize: number;
   languages: Record<string, number>;
+  analysis: Analysis;
 }
 
 const App: React.FC = () => {
@@ -30,6 +44,13 @@ const App: React.FC = () => {
     totalDirs: 0,
     totalSize: 0,
     languages: {},
+    analysis: {
+      purpose: "",
+      technologies: [],
+      architecture: "",
+      system_flow: "",
+      components: [],
+    },
   });
 
   return (
