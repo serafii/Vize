@@ -1,5 +1,6 @@
 import React from "react";
 import { HexagonIcon } from "lucide-react";
+import { GithubIcon } from "../Utils/Icons";
 
 const Footer: React.FC = () => {
   return (
@@ -39,23 +40,27 @@ const Footer: React.FC = () => {
             </div>
             <div>
               <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
-                Legal
+                Support
               </h4>
               <ul className="space-y-3">
                 <li>
                   <a
-                    href="#"
+                    href="https://github.com/serafii/Vize/issues"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm text-gray-500 hover:text-white transition-colors"
                   >
-                    Privacy
+                    Report issue
                   </a>
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="https://github.com/serafii/Vize/discussions"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm text-gray-500 hover:text-white transition-colors"
                   >
-                    Terms
+                    Contact
                   </a>
                 </li>
               </ul>
@@ -69,6 +74,17 @@ const Footer: React.FC = () => {
             &copy; {new Date().getFullYear()} Vize Analyzer &middot; All rights
             reserved
           </span>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://github.com/serafii/Vize"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-white transition-colors fill-current"
+              aria-label="GitHub"
+            >
+              {GithubIcon}
+            </a>
+          </div>
         </div>
       </div>
     </footer>

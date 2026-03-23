@@ -24,25 +24,22 @@ const Reason: React.FC = () => {
 
           <div className="space-y-4 text-sm text-gray-400 leading-relaxed">
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit
-              aspernatur cumque alias. Omnis, ipsa delectus quo ea repellendus
-              provident voluptatibus suscipit, autem fugiat repellat ipsum
-              laudantium qui iure accusamus pariatur!
+              We built Vize to provide developers with a powerful and efficient
+              tool to quickly understand a codebase.
             </p>
             <p>
-              lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit
-              aspernatur cumque alias. Omnis, ipsa delectus quo ea repellendus
-              provident voluptatibus suscipit, autem fugiat repellat ipsum
-              laudantium qui iure accusamus pariatur!
+              Whether you're joining a new project for the first time, or coming
+              back to an old one after a long break, going through the codebase
+              manually can be time-consuming and exhausting.
             </p>
             <p>
-              lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit
-              aspernatur cumque alias. Omnis, ipsa delectus quo ea{" "}
+              Vize solves that problem by turning your codebase into a clear and
+              structured overview. You get an instant breakdown of what your
+              project does and how it's organized,{" "}
               <span className="text-white font-medium">
-                repellendus provident voluptatibus
+                highlighting the most important parts
               </span>{" "}
-              suscipit, autem fugiat repellat ipsum laudantium qui iure
-              accusamus pariatur!
+              to help you understand the project in minutes.
             </p>
           </div>
         </div>
