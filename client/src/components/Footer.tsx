@@ -29,26 +29,10 @@ const Footer: React.FC = () => {
               <ul className="space-y-3">
                 <li>
                   <a
-                    href="#"
+                    href="#features"
                     className="text-sm text-gray-500 hover:text-white transition-colors"
                   >
                     Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-sm text-gray-500 hover:text-white transition-colors"
-                  >
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-sm text-gray-500 hover:text-white transition-colors"
-                  >
-                    Changelog
                   </a>
                 </li>
               </ul>
@@ -72,14 +56,6 @@ const Footer: React.FC = () => {
                     className="text-sm text-gray-500 hover:text-white transition-colors"
                   >
                     Terms
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-sm text-gray-500 hover:text-white transition-colors"
-                  >
-                    License
                   </a>
                 </li>
               </ul>

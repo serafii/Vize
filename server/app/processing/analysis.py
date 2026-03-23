@@ -48,7 +48,7 @@ def extract_json(text: str):
         try:
             return json.loads(match.group())
         except json.JSONDecodeError:
-            pass
+            raise ValueError("Failed to analyze the codebase")
 
     return {"error": "Invalid JSON from LLM", "raw": text}
 
