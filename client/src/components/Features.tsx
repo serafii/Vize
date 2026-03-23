@@ -50,7 +50,10 @@ const Features: React.FC = () => {
         viewport={{ once: true }}
         className="text-center mb-10"
       >
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest">
+        <h2
+          className="text-sm font-semibold text-gray-500 uppercase tracking-widest"
+          id="features"
+        >
           Our Features
         </h2>
       </motion.div>

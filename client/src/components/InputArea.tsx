@@ -8,13 +8,6 @@ interface InputAreaProps {
   onAnalyze: (url: string) => void;
   setAnalysisResult: (result: any) => void;
 }
-// interface AnalysisResult {
-//   totalFiles: number;
-//   totalDirs: number;
-//   totalSize: number;
-//   languages: Record<string, number>;
-//   analysis: Record<string, string>;
-// }
 
 const InputArea: React.FC<InputAreaProps> = ({
   onAnalyze,
@@ -41,6 +34,10 @@ const InputArea: React.FC<InputAreaProps> = ({
         type: "warning",
         content:
           "Only .zip files are supported. Please upload a valid .zip file.",
+        className: "custom-class",
+        style: {
+          marginTop: "20vh",
+        },
       });
       return;
     }
@@ -55,6 +52,11 @@ const InputArea: React.FC<InputAreaProps> = ({
     }
 
     setUploadFile(file);
+
+    messageApi.open({
+      type: "success",
+      content: `File "${file.name}" uploaded successfully`,
+    });
   };
 
   const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -65,7 +67,11 @@ const InputArea: React.FC<InputAreaProps> = ({
     if (!file) return;
 
     if (!file.name.endsWith(".zip")) {
-      messageApi.warning("Only .zip files are supported.");
+      messageApi.open({
+        type: "warning",
+        content:
+          "Only .zip files are supported. Please upload a valid .zip file.",
+      });
       return;
     }
 
@@ -75,6 +81,10 @@ const InputArea: React.FC<InputAreaProps> = ({
     }
 
     setUploadFile(file);
+    messageApi.open({
+      type: "success",
+      content: `File "${file.name}" uploaded successfully`,
+    });
   };
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -280,7 +290,13 @@ const InputArea: React.FC<InputAreaProps> = ({
                 <span className="text-xs text-accent">{uploadFile.name}</span>
                 <button
                   type="button"
-                  onClick={() => setUploadFile(null)}
+                  onClick={() => {
+                    setUploadFile(null);
+                    messageApi.open({
+                      type: "info",
+                      content: "File selection cleared.",
+                    });
+                  }}
                   className="text-red-400 text-xs hover:text-red-500 hover:cursor-pointer transition-colors"
                 >
                   <XIcon className="w-4 h-4" />
@@ -313,6 +329,11 @@ const InputArea: React.FC<InputAreaProps> = ({
                 </>
               )}
             </button>
+            {isSubmitting && (
+              <p className="text-sm text-gray-500 text-center mt-2">
+                Analyzing your project, this may take a moment...
+              </p>
+            )}
           </form>
         </div>
       </motion.div>

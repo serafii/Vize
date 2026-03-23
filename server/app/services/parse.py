@@ -10,6 +10,8 @@ MAX_UNZIPPED_SIZE_MB = 50
 MAX_FILES = 2000
 MAX_SNIPPETS = 12
 MAX_CANDIDATES = 100
+MIN_TOTAL_FILES = 5
+MIN_CODE_FILES = 3
 
 # Validate the zip file before extracting to ensure it doesn't exceed size or file count limits
 def validate_zip(file: UploadFile) -> tuple[bool, str | None]:
@@ -33,6 +35,26 @@ def validate_zip(file: UploadFile) -> tuple[bool, str | None]:
         return False, f"Too many files ({total_files})"
 
     return True, None
+
+# Validate that the parsed file is a valid code repository
+def validate_repository(parse_result: dict) -> tuple[bool, str | None]:
+    total_files = parse_result.get("total_files", 0)
+    languages = parse_result.get("languages", {})
+
+    if total_files < MIN_TOTAL_FILES:
+        return False, f"Repository too small ({total_files} files)"
+
+    code_files = 0
+    for lang, percentage in languages.items():
+        if lang != "Other":
+            # Convert percentage back to approximate count
+            code_files += int((percentage / 100) * total_files)
+
+    if code_files < MIN_CODE_FILES:
+        return False, "Not enough code files detected"
+    
+    return True, None
+    
 
 # Walk through the directory and count files, directories, and total size while ignoring irrelevant files and directories
 def parse_directory(directory:str) -> dict:

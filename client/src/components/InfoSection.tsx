@@ -6,15 +6,15 @@ const InfoSection: React.FC = () => {
   const hints = [
     {
       icon: <FileSearchIcon className="w-4 h-4" />,
-      text: "Deep dependency mapping",
+      text: "Architecture analysis",
     },
     {
       icon: <ZapIcon className="w-4 h-4" />,
-      text: "Instant vulnerability scanning",
+      text: "Fast data processing",
     },
     {
       icon: <ShieldCheckIcon className="w-4 h-4" />,
-      text: "Secure & private analysis",
+      text: "Secure & private",
     },
   ];
 
