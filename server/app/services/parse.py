@@ -8,7 +8,7 @@ from app.services.score import score_file
 
 MAX_UNZIPPED_SIZE_MB = 50
 MAX_FILES = 2000
-MAX_SNIPPETS = 20
+MAX_SNIPPETS = 12
 MAX_CANDIDATES = 100
 
 # Validate the zip file before extracting to ensure it doesn't exceed size or file count limits
@@ -120,7 +120,7 @@ def parse_directory(directory:str) -> dict:
     other_count = 0
 
     for i, (lang, count) in enumerate(sorted_langs):
-        if i < top_langs and lang != "Other":
+        if i < top_langs and lang != "Other" and total_files > 0:
             dominant_languages[lang] = round((count / total_files) * 100, 2)
         else:
             other_count += count

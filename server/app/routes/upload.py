@@ -1,6 +1,8 @@
 import zipfile
 from fastapi import APIRouter, Form, File, UploadFile
 from app.services.parse import parse_directory, validate_zip, cleanup_directory, safe_extract
+from app.services.format import format_analysis_input
+from app.processing.analysis import codebase_analysis
 import uuid
 
 upload_router = APIRouter()
@@ -32,8 +34,13 @@ async def analyze_codebase(url: str = Form(None), file: UploadFile = File(None))
         # Parse the extracted directory and clean up afterward
         try:
             parse_result = parse_directory(upload_dir)
-            print(parse_result)
-            
+
+            codebase_analysis_prompt = format_analysis_input(parse_result)
+
+            # Prompt the LLM with the formatted codebase analysis input and return the response
+            result = codebase_analysis(codebase_analysis_prompt)
+            print(result)
+
         finally:
             cleanup_directory(upload_dir)
 
@@ -41,5 +48,6 @@ async def analyze_codebase(url: str = Form(None), file: UploadFile = File(None))
         "success": True,
         "type": "file",
         "filename": file.filename,
-        "data": parse_result
+        "data": parse_result,
+        "analysis": result
     }
