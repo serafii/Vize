@@ -6,21 +6,21 @@ const Features: React.FC = () => {
   const features = [
     {
       icon: <GitBranchIcon className="w-6 h-6 text-accent" />,
-      title: "Feature 1",
+      title: "Flexible Input",
       description:
-        "lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Upload your project folder or simply provide a public repository URL to get started. No setup required.",
     },
     {
       icon: <ShieldCheckIcon className="w-6 h-6 text-accent" />,
-      title: "Feature 2",
+      title: "Deep Code Analysis",
       description:
-        "lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Automatically detects the tech stack, maps out architecture, and identifies key components for a clear overview of your codebase.",
     },
     {
       icon: <BarChart3Icon className="w-6 h-6 text-accent" />,
-      title: "Feature 3",
+      title: "Structured Output",
       description:
-        "lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Get a clean, readable breakdown of your codebase so you can understand it quickly without having to read through all the code.",
     },
   ];
   const containerVariants = {

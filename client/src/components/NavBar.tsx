@@ -36,7 +36,7 @@ const NavBar: React.FC = () => {
           </span>
 
           <a
-            href="https://github.com"
+            href="https://github.com/serafii/Vize"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-black bg-accent hover:brightness-110 transition-all active:scale-[0.97]"
