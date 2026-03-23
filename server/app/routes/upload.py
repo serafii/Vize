@@ -29,8 +29,11 @@ async def analyze_codebase(url: str = Form(None), file: UploadFile = File(None))
 
         file.file.seek(0)
 
+        # Parse the extracted directory and clean up afterward
         try:
             parse_result = parse_directory(upload_dir)
+            print(parse_result)
+            
         finally:
             cleanup_directory(upload_dir)
 
