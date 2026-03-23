@@ -126,7 +126,7 @@ const InputArea: React.FC<InputAreaProps> = ({
       }
 
       const response = await axios.post(
-        "http://localhost:8000/upload/analyze",
+        "https://vize-1-zvrl.onrender.com/upload/analyze",
         formData,
       );
 

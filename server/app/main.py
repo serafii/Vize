@@ -5,7 +5,8 @@ from app.routes.upload import upload_router
 app = FastAPI()
 origins = [
     "http://localhost:5173", 
-    "http://127.0.0.1:5173"
+    "http://127.0.0.1:5173",
+    "https://vize-qzbg.onrender.com"
 ]
 
 app.add_middleware(
