@@ -1,6 +1,8 @@
 import os
 import shutil
+import stat
 import zipfile
+import time
 from fastapi import UploadFile
 from app.utils.languages import KNOWN_LANGUAGES, IGNORED_DIRS, IGNORED_EXTENSIONS
 from app.utils.importance import IMPORTANT_FILES
@@ -159,12 +161,21 @@ def parse_directory(directory:str) -> dict:
 
     return {"total_files": total_files, "total_dirs": total_dirs, "total_size": total_size, "languages": dominant_languages, "snippets": snippets}
 
+# Helper function to remove read-only files during cleanup on Windows
+def remove_readonly(func, path, excinfo):
+    # Change the file to writable and retry
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
 # Removes the temporary directory
 def cleanup_directory(upload_dir: str):
-    try:
-        shutil.rmtree(upload_dir)
-    except Exception as e:
-        print("Cleanup error:", e)
+    for _ in range(3):
+        try:
+            shutil.rmtree(upload_dir, onexc=remove_readonly)
+            return
+        except Exception:
+            time.sleep(0.2)
+    print("Cleanup error after retries:", upload_dir)
 
 # Ensures that the zip file is safely extracted
 def safe_extract(zip_ref: zipfile.ZipFile, path: str):

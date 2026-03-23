@@ -3,6 +3,7 @@ from fastapi import APIRouter, Form, File, UploadFile
 from app.services.parse import parse_directory, validate_repository, validate_zip, cleanup_directory, safe_extract
 from app.services.format import format_analysis_input
 from app.processing.analysis import codebase_analysis
+from app.services.fetch import repo_exists, clone_repository, verify_repository
 import uuid
 import asyncio
 import os
@@ -20,51 +21,72 @@ async def analyze_codebase(url: str = Form(None), file: UploadFile = File(None))
     async with semaphore:
         upload_dir = f"uploaded_codebase_{uuid.uuid4().hex}"
         os.makedirs(upload_dir, exist_ok=True)
-    
-    if url:
-        # Will be added after the file upload logic is implemented
-       return {"success": True, "type": "url", "message": "URL logic to be implemented"}
-    elif file:
-        # Validate the zip file before extracting
-        is_valid, error_message = validate_zip(file)
-        if not is_valid:
-            return {"success": False, "message": error_message}
 
-        # Extract the zip file and proceed to parse files if the size is acceptable
-
-        with zipfile.ZipFile(file.file, 'r') as zip_ref:
-            safe_extract(zip_ref, upload_dir)
-
-        file.file.seek(0)
-
-        # Parse the extracted directory and clean up afterward
         try:
-            parse_result = parse_directory(upload_dir)
-            
-            valid, error = validate_repository(parse_result)
+            if url:
+                # Verify that the repository exists
+                if not repo_exists(url):
+                    return {"success":False, "message":"Could not find any corresponding repository"}
+                    
+                # Clone the repository and validate its contents
+                try:
+                    await asyncio.to_thread(clone_repository, url, upload_dir)
+                except Exception:
+                    return {"success": False, "message": "Failed to clone repository"}
 
-            if not valid:
-                return {
-                    "success": False,
-                    "error": error
-                }
+                valid, error = await asyncio.to_thread(verify_repository, upload_dir)
 
-            codebase_analysis_prompt = format_analysis_input(parse_result)
+                if not valid:
+                    return {"success": False, "message": error}
+                    
+                return await process_pipeline(upload_dir, "url", url)
+                
+            elif file:
+                # Validate the zip file before extracting
+                is_valid, error_message = validate_zip(file)
+                if not is_valid:
+                    return {"success": False, "message": error_message}
 
-            # Prompt the LLM with the formatted codebase analysis input and return the response
-            result = codebase_analysis(codebase_analysis_prompt)
-        except ValueError as ve:
-            return {
-                "success": False,
-                "error": str(ve)
-            }
+                # Extract the zip file and proceed to parse files if the size is acceptable
+
+                with zipfile.ZipFile(file.file, 'r') as zip_ref:
+                    safe_extract(zip_ref, upload_dir)
+
+                file.file.seek(0)
+
+                return await process_pipeline(upload_dir, "file", file.filename)
+        except Exception as e:
+            return {"success": False, "message": str(e)}
         finally:
             cleanup_directory(upload_dir)
 
+async def process_pipeline(path: str, type: str, source: str):
+    # Parse the extracted directory and clean up afterward
+    try:
+        parse_result = await asyncio.to_thread(parse_directory, path)
+                
+        valid, error = validate_repository(parse_result)
+
+        if not valid:
+            return {
+                "success": False,
+                "error": error
+            }
+
+        codebase_analysis_prompt = format_analysis_input(parse_result)
+
+        # Prompt the LLM with the formatted codebase analysis input and return the response
+        result = await asyncio.to_thread(codebase_analysis, codebase_analysis_prompt)
+    except ValueError as ve:
         return {
+            "success": False,
+            "error": str(ve)
+        }
+
+    return {
         "success": True,
-        "type": "file",
-        "filename": file.filename,
+        "type": type,
+        "source": source,
         "data": parse_result,
         "analysis": result
-    }
+        }
