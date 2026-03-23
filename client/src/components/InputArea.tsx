@@ -7,11 +7,15 @@ import axios from "axios";
 interface InputAreaProps {
   onAnalyze: (url: string) => void;
   setAnalysisResult: (result: any) => void;
+  setAnalysisComplete: () => void;
+  setAnalysisError: () => void;
 }
 
 const InputArea: React.FC<InputAreaProps> = ({
   onAnalyze,
   setAnalysisResult,
+  setAnalysisComplete,
+  setAnalysisError,
 }) => {
   const [url, setUrl] = useState<string>("");
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -111,6 +115,9 @@ const InputArea: React.FC<InputAreaProps> = ({
 
     try {
       setIsSubmitting(true);
+
+      onAnalyze(url || uploadFile?.name || "uploaded project");
+
       const formData = new FormData();
       if (uploadFile) {
         formData.append("file", uploadFile);
@@ -124,10 +131,6 @@ const InputArea: React.FC<InputAreaProps> = ({
       );
 
       if (response.data.success) {
-        response.data.type === "file"
-          ? onAnalyze(response.data.filename)
-          : onAnalyze(url);
-
         const { total_files, total_dirs, total_size, languages } =
           response.data.data;
 
@@ -142,6 +145,7 @@ const InputArea: React.FC<InputAreaProps> = ({
         };
 
         setAnalysisResult(analyzedData);
+        setAnalysisComplete();
       }
 
       if (response.data.success == false) {
@@ -159,6 +163,7 @@ const InputArea: React.FC<InputAreaProps> = ({
         content:
           "An error occurred while processing your request. Please try again.",
       });
+      setAnalysisError();
     } finally {
       setIsSubmitting(false);
     }
@@ -297,7 +302,7 @@ const InputArea: React.FC<InputAreaProps> = ({
                       content: "File selection cleared.",
                     });
                   }}
-                  className="text-red-400 text-xs hover:text-red-500 hover:cursor-pointer transition-colors"
+                  className={`text-red-400 text-xs hover:text-red-500 hover:cursor-pointer transition-colors ${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
                 >
                   <XIcon className="w-4 h-4" />
                 </button>
@@ -329,11 +334,6 @@ const InputArea: React.FC<InputAreaProps> = ({
                 </>
               )}
             </button>
-            {isSubmitting && (
-              <p className="text-sm text-gray-500 text-center mt-2">
-                Analyzing your project, this may take a moment...
-              </p>
-            )}
           </form>
         </div>
       </motion.div>

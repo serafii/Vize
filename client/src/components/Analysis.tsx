@@ -15,7 +15,7 @@ import LANGUAGE_COLORS from "../Utils/languages";
 import { ClaudeIcon } from "../Utils/Icons";
 
 interface ResultsViewProps {
-  analyzedUrl: string;
+  analyzedUrl: string | null;
   onBack: () => void;
   analysisResult?: {
     totalFiles: number;
@@ -84,7 +84,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             </h2>
             <p
               className="text-sm text-gray-400 truncate max-w-md"
-              title={analyzedUrl}
+              title={analyzedUrl || undefined}
             >
               Target: <span className="text-accent">{analyzedUrl}</span>
             </p>
