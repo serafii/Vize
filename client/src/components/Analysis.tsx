@@ -26,7 +26,7 @@ interface ResultsViewProps {
       purpose: string;
       technologies: string[];
       architecture: string;
-      system_flow: string;
+      system_flow: string[];
       components: {
         name: string;
         description: string;
@@ -221,9 +221,11 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             <h3 className="text-lg font-semibold text-white">System Flow</h3>
           </div>
           <div className="bg-background rounded-xl p-4 border border-white/5">
-            <p className="text-sm text-gray-400 leading-relaxed">
-              {analysisResult?.analysis.system_flow}
-            </p>
+            <ol className="list-decimal pl-5 space-y-2 text-sm text-gray-400 leading-relaxed">
+              {analysisResult?.analysis.system_flow.map((step, index) => (
+                <li key={`${step}-${index}`}>{step}</li>
+              ))}
+            </ol>
           </div>
         </div>
 
