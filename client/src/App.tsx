@@ -22,7 +22,7 @@ interface Analysis {
   purpose: string;
   technologies: string[];
   architecture: string;
-  system_flow: string;
+  system_flow: string[];
   components: Component[];
 }
 
@@ -62,7 +62,7 @@ const App: React.FC = () => {
       purpose: "",
       technologies: [],
       architecture: "",
-      system_flow: "",
+      system_flow: [],
       components: [],
     },
   });

@@ -5,7 +5,7 @@ import zipfile
 import time
 from fastapi import UploadFile
 from app.utils.languages import KNOWN_LANGUAGES, IGNORED_DIRS, IGNORED_EXTENSIONS
-from app.utils.importance import IMPORTANT_FILES
+from app.utils.importance import IMPORTANT_FILES_CORE
 from app.services.score import score_file
 
 MAX_UNZIPPED_SIZE_MB = 50
@@ -91,7 +91,7 @@ def parse_directory(directory:str) -> dict:
             language_frequency[lang] = language_frequency.get(lang, 0) + 1
 
             is_known = ext in KNOWN_LANGUAGES
-            is_important_file = file.lower() in IMPORTANT_FILES
+            is_important_file = file.lower() in IMPORTANT_FILES_CORE
 
             # Skip lesser known files to focus on main important files
             if not is_known and not is_important_file:
