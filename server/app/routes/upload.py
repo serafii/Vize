@@ -83,7 +83,7 @@ async def process_pipeline(path: str, type: str, source: str):
         if not valid:
             return {
                 "success": False,
-                "error": error
+                "message": error
             }
 
         codebase_analysis_prompt = format_analysis_input(parse_result)
@@ -93,7 +93,12 @@ async def process_pipeline(path: str, type: str, source: str):
     except ValueError as ve:
         return {
             "success": False,
-            "error": str(ve)
+            "message": str(ve)
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
         }
 
     return {

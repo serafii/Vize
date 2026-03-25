@@ -12,8 +12,8 @@ MAX_UNZIPPED_SIZE_MB = 50
 MAX_FILES = 2000
 MAX_SNIPPETS = 12
 MAX_CANDIDATES = 100
-MIN_TOTAL_FILES = 5
-MIN_CODE_FILES = 3
+MIN_TOTAL_FILES = 1
+MIN_CODE_FILES = 1
 
 # Validate the zip file before extracting to ensure it doesn't exceed size or file count limits
 def validate_zip(file: UploadFile) -> tuple[bool, str | None]:
